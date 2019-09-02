@@ -1,6 +1,6 @@
 (function(wHandle, wjQuery) {
     /*global navigator, Image, $*/
-    var CONNECTION_URL = "127.0.0.1:443"; // Default Connection IP
+    var CONNECTION_URL = "127.0.0.1:8081"; // Default Connection IP
     var SKIN_URL = "./skins/"; // Skins Directory
     wHandle.setServer = function(arg) {
         if (arg != gameMode) {
@@ -474,7 +474,7 @@
     function showConnecting() {
         if (!connecting) return;
         wjQuery("#connecting").show();
-        wsConnect((useHttps ? "wss://" : "ws://") + CONNECTION_URL);
+        wsConnect((useHttps ? "ws://" : "ws://") + CONNECTION_URL);
     }
     function wsConnect(wsUrl) {
         if (ws) {
@@ -486,7 +486,7 @@
             } catch (b) {}
             ws = null;
         }
-        wsUrl = (useHttps ? "wss://" : "ws://") + CONNECTION_URL;
+        wsUrl = (useHttps ? "ws://" : "ws://") + CONNECTION_URL;
         nodesOnScreen = [];
         playerCells = [];
         nodes = {};
@@ -505,7 +505,7 @@
     function prepareData(a) {
         return new DataView(new ArrayBuffer(a));
     }
-    function wsSend(a) {
+    function wsend(a) {
         ws.send(a.buffer);
     }
     function onWsOpen() {
@@ -516,11 +516,11 @@
         msg = prepareData(5);
         msg.setUint8(0, 254);
         msg.setUint32(1, 5, 1); // Protcol 5
-        wsSend(msg);
+        wsend(msg);
         msg = prepareData(5);
         msg.setUint8(0, 255);
         msg.setUint32(1, 1332175218, 1);
-        wsSend(msg);
+        wsend(msg);
         sendNickName();
     }
     function onWsClose() {
@@ -800,7 +800,7 @@
                 msg.setFloat64(1, X, 1);
                 msg.setFloat64(9, Y, 1);
                 msg.setUint32(17, 0, 1);
-                wsSend(msg);
+                wsend(msg);
             }
         }
     }
@@ -809,7 +809,7 @@
             var msg = prepareData(1 + 2 * userNickName.length);
             msg.setUint8(0, 0);
             for (var i = 0; i < userNickName.length; ++i) msg.setUint16(1 + 2 * i, userNickName.charCodeAt(i), 1);
-            wsSend(msg);
+            wsend(msg);
         }
     }
     function sendChat(str) {
@@ -822,7 +822,7 @@
                 msg.setUint16(offset, str.charCodeAt(i), 1);
                 offset += 2;
             }
-            wsSend(msg);
+            wsend(msg);
         }
     }
     function wsIsOpen() {
@@ -832,7 +832,7 @@
         if (wsIsOpen()) {
             var msg = prepareData(1);
             msg.setUint8(0, a);
-            wsSend(msg);
+            wsend(msg);
         }
     }
     function redrawGameScene() {
